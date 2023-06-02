@@ -1,3 +1,5 @@
+// set data attribute
+
 let tasks =[];
 const addTask = function(){
     let input = document.getElementById('input');
@@ -36,19 +38,40 @@ const getTable = function(i, task){
     }else{
         rate = 'High'
     }
-    let tr = `
-    <tr>
-    <td id="id">${i+1}</td>
-    <td id="todoLine">${task.todo.trim()}</td>
-    <td id="TaskRate">${rate}</td>
-    <td>
-    <button class="btn btn-danger" onclick="DeleteTodo(${i})">Delete</button>
-    <button class="btn btn-warning" id="edit" onclick="EditTodo(${i})">Edit</button>
-    <button class="btn btn-success hide" id="save"  onclick="save(${i})">Save</button>
-    </td>
-    </tr>
-    `
+
+    let tr = getTheRow(i,task, rate)
+    // `
+    // <tr>
+    // <td id="id_${i}">${i+1}</td>
+    // <td id="todoLine_${i}">${task.todo.trim()}</td>
+    // <td id="TaskRate_${i}">${rate}</td>
+    // <td>
+    // <button class="btn btn-danger" id="delete_${i}" onclick="DeleteTodo(${i})">Delete</button>
+    // <button class="btn btn-warning" id="edit_${i}" onclick="EditTodo(${i})">Edit</button>
+    // <button class="btn btn-success" id="save_${i}"  onclick="save(${i})">Save</button>
+    // <button class="btn btn-secondary" id="cancel${i}"  onclick="cancel(${i})">Cancel</button>
+    // </td>
+    // </tr>
+    // `
     return tr;
+}
+const getTheRow = (i,task, rate)=>{
+    return `<tr>
+    <td id="id_${i}">${i+1}</td>
+    <td id="todoLine_${i}">${task.editable? `<input type="text" class="form-control" id="editedTodo_${i}" value="${tasks[i].todo}" />`:task.todo.trim()}</td>
+    <td id="TaskRate_${i}">${task.editable? `<select type="text" class="form-select" id="editedRate_${i}" value="${tasks[i].rate}">
+            <option disabled selected value="">Open the priority</option>
+            <option value= '1' >Low - 1</option>
+            <option value= '2' >Medium - 2</option>
+            <option value= '3' >High - 3</option>
+        </select>`:rate}</td>
+        <td class = "d-flex  justify-content-center">${task.editable? `<button class="btn btn-success" id="save_${i}"  onclick="save(${i})">Save</button>
+        <button class="btn btn-secondary ms-2" id="cancel${i}"  onclick="cancel(${i})">Cancel</button>`
+
+        :`<button class="btn btn-danger" id="delete_${i}" onclick="DeleteTodo(${i})">Delete</button>
+        <button class="btn btn-warning ms-2" id="edit_${i}" onclick="EditTodo(${i})">Edit</button>`}
+        </td>
+    </tr>`
 }
 const addTasksTList = function(task){
     tasks.push(task);
@@ -72,32 +95,81 @@ const find = function(){
     }
     console.log(tasks[minI]);
 }
-const EditTodo = function(i){
-    // THE PROBLEM IS iN Here 👇
-    const todoLine = document.querySelector("#todoLine");
-    const TaskRate = document.querySelector("#TaskRate");
-    const id = document.getElementById("id").textContent;
+// const EditTodo = function(i){
+//     // THE PROBLEM IS iN Here 👇 / Solved! by adding {i} to all the id's
+//     const todoLine = document.querySelector(`#todoLine_${i}`);
+//     const TaskRate = document.querySelector(`#TaskRate_${i}`);
+//     const id = document.getElementById(`id_${i}`).textContent;
 
-    todoLine.innerHTML = `<input type="text" class="form-control" id="editedTodo" value="${tasks[i].todo}"  />`
-    TaskRate.innerHTML = `<select type="text" class="form-select" id="editedRate" value="${tasks[i].rate}">
-    <option disabled selected value="">Open the priority</option>
-                    <option value= '1' >Low - 1</option>
-                    <option value= '2' >Medium - 2</option>
-                    <option value= '3' >High - 3</option>
-    </select>`
-    document.getElementById('edit').classList.add('hide')
-    document.getElementById('save').classList.remove('hide')
+//     todoLine.innerHTML = `<input type="text" class="form-control" id="editedTodo_${i}" value="${tasks[i].todo}"  />`
+//     TaskRate.innerHTML = `<select type="text" class="form-select" id="editedRate_${i}" value="${tasks[i].rate}">
+//     <option disabled selected value="">Open the priority</option>
+//                     <option value= '1' >Low - 1</option>
+//                     <option value= '2' >Medium - 2</option>
+//                     <option value= '3' >High - 3</option>
+//     </select>`
+//     document.getElementById(`edit_${i}`).classList.add('hide')
+//     document.getElementById(`delete_${i}`).classList.add('hide')
+//     document.getElementById(`save_${i}`).classList.remove('hide')
+//     document.getElementById(`cancel${i}`).classList.remove('hide')
+// }
+const EditTodo = (i)=>{
+tasks[i].editable = true;
+renderTheTable(tasks)
+}
+const cancel = (i)=>{
+    tasks[i].editable = false;
+    renderTheTable(tasks)
+}
+const save = (i)=>{
+    let editedTodo = document.getElementById(`editedTodo_${i}`);  
+    let editedRate = document.getElementById(`editedRate_${i}`);
+    if(editedRate.value > 3 || editedRate.value < 0){
+        return alert('Please Enter a valid priority between 1 to 3')
+    }
+    tasks[i].todo = editedTodo.value;
+    tasks[i].rate = editedRate.value;
+    tasks[i].editable = false
+    renderTheTable(tasks)
 }
 
-const save = function(i){
-        let editedTodo = document.getElementById('editedTodo');  
-        let editedRate = document.getElementById('editedRate');
-        if(editedRate.value > 3 || editedRate.value < 0){
-            return alert('Please Enter a valid priority between 1 to 3')
-        }
-        tasks[i].todo = editedTodo.value;
-        tasks[i].rate = editedRate.value;
-        document.getElementById('save').classList.add('hide')
-        document.getElementById('edit').classList.remove('hide')
-        renderTheTable(tasks)
+// const save = function(i){
+//         let editedTodo = document.getElementById(`editedTodo_${i}`);  
+//         let editedRate = document.getElementById(`editedRate_${i}`);
+//         if(editedRate.value > 3 || editedRate.value < 0){
+//             return alert('Please Enter a valid priority between 1 to 3')
+//         }
+//         tasks[i].todo = editedTodo.value;
+//         tasks[i].rate = editedRate.value;
+//         document.getElementById(`edit_${i}`).classList.add('hide')
+//         document.getElementById(`cancel${i}`).classList.add('hide')
+//         document.getElementById(`delete_${i}`).classList.remove('hide')
+//         document.getElementById(`save_${i}`).classList.remove('hide')
+//         renderTheTable(tasks)
+// }
+
+const changeRate = ()=>{
+    tasks.sort(function(a,b){
+        return b.rate - a.rate
+    })
+    console.log("clicked on priorty");
+    renderTheTable(tasks)
 }
+const changeName = ()=>{
+    tasks.sort(function(a,b){
+        if (a.todo < b.todo) return -1
+        if (a.todo > b.todo) return 1
+        return 0
+    })
+    renderTheTable(tasks)
+    console.log("Change name");
+}
+// const align = (a,b) => {
+//     if(a.priority > b.priority){
+//         return 1
+//     }else if(a.priority < b.priority){
+//         return -1
+//     }else{
+//         return 0
+//     }
+// }

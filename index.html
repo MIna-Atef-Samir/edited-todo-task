@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="todo w-75 mx-auto text-danger-emphasis bg-danger-subtle border border-danger-subtle rounded-3 p-5 ">
+        <div class="todo w-75 mx-auto text-info-emphasis bg-primary-subtle border border-info-subtle rounded-3 p-5 ">
             <h1 class="text-center mb-4">TODO List</h1>
             <div class="addfield d-flex">
                 <input type="text" class="form-control" name="" id="input" placeholder="Add your todo">
@@ -26,8 +26,8 @@
                 <table class="table">
                     <thead class="table-dark">
                         <th>#</th>
-                        <th>ToDo</th>
-                        <th>Priority</th>
+                        <th class="hov" onclick="changeName()">ToDo</th>
+                        <th class="hov" onclick="changeRate()">Priority</th>
                         <th>Actions</th>
                     </thead>
                     <tbody id="list">
